@@ -6,6 +6,7 @@ The wav is converted to text, and the text is written as an exif description tag
 
 ## installation (mac)
 
+```bash
   brew install portaudio 
   python3 -m venv env
   source env/bin/activate
@@ -13,3 +14,4 @@ The wav is converted to text, and the text is written as an exif description tag
   pip install pyaudio
   pip install SpeechRecognition
   pip install exif
+```
