@@ -1,6 +1,6 @@
 # wav2exif
 
-This script scans the SD card written by Fuji X cameras and searches for audio recordings (.WAV files).
+This script scans the SD card written by Fuji X cameras and searches for audio/voice recordings (.WAV files).
 
 The wav is converted to text, and the text is written as an exif description tag to the coresponding .JPG or .RAF file
 
