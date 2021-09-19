@@ -86,14 +86,27 @@ else:
             image = Image(file)
             
             # only set description if not set
-            if not hasattr(image,'image_description'):
+            if not image.get('image_description'):
 
                 if not text:
                     text,ascii = audio2text(audio)
+                    # image description longer than 54 chars results in PackError
+                    ascii=ascii[0:54]
+                try:
+                    image.image_description = ascii
+                except Exception as e:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(file,exc_type, fname, exc_tb.tb_lineno,ascii)
 
-                image.image_description = ascii
-                image.user_comment = text
+                try:
+                    image.user_comment = text
+                except Exception as e:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(file,exc_type, fname, exc_tb.tb_lineno, text)
+
                 with open(file, 'wb') as updated_file:
-                    print(f'.. update {file}: "{ascii}"')
+                    print(f'.. update {file}: "{text}"')
                     updated_file.write(image.get_file())
                     updated_file.close()
