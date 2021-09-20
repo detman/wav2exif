@@ -1,35 +1,6 @@
 import speech_recognition as sr
 import sys
 import os
-from exif import Image
-from unidecode import unidecode
-
-def remove_umlaut(string):
-    # https://gist.github.com/johnberroa/cd49976220933a2c881e89b69699f2f7
-    """
-    Removes umlauts from strings and replaces them with the letter+e convention
-    :param string: string to remove umlauts from
-    :return: unumlauted string
-    """
-    u = 'ü'.encode()
-    U = 'Ü'.encode()
-    a = 'ä'.encode()
-    A = 'Ä'.encode()
-    o = 'ö'.encode()
-    O = 'Ö'.encode()
-    ss = 'ß'.encode()
-
-    string = string.encode()
-    string = string.replace(u, b'ue')
-    string = string.replace(U, b'Ue')
-    string = string.replace(a, b'ae')
-    string = string.replace(A, b'Ae')
-    string = string.replace(o, b'oe')
-    string = string.replace(O, b'Oe')
-    string = string.replace(ss, b'ss')
-
-    string = string.decode('utf-8')
-    return string
 
 def audio2text(audio):
     """
@@ -41,9 +12,11 @@ def audio2text(audio):
         audio = r.listen(source)
 
     text = r.recognize_google(audio, language="de_DE.utf8")
-    text = remove_umlaut(text)
-    ascii = text.encode('ascii','ignore').decode('utf-8')
-    return text,ascii
+    print(f'fetched {file}: {text}')
+    return text
+
+def updateExif(file,text):
+    os.system(f'exiftool -ImageDescription="{text}" {file}')
 
 
 if len(sys.argv) == 1:
@@ -80,33 +53,7 @@ else:
             print(f'.. no picture found for audio')
             continue
 
-        text,ascii = None,None
+        text = audio2text(audio)
 
         for file in image_files:
-            image = Image(file)
-            
-            # only set description if not set
-            if not image.get('image_description'):
-
-                if not text:
-                    text,ascii = audio2text(audio)
-                    # image description longer than 54 chars results in PackError
-                    ascii=ascii[0:54]
-                try:
-                    image.image_description = ascii
-                except Exception as e:
-                    exc_type, exc_obj, exc_tb = sys.exc_info()
-                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                    print(file,exc_type, fname, exc_tb.tb_lineno,ascii)
-
-                try:
-                    image.user_comment = text
-                except Exception as e:
-                    exc_type, exc_obj, exc_tb = sys.exc_info()
-                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                    print(file,exc_type, fname, exc_tb.tb_lineno, text)
-
-                with open(file, 'wb') as updated_file:
-                    print(f'.. update {file}: "{text}"')
-                    updated_file.write(image.get_file())
-                    updated_file.close()
+            updateExif(file,text)

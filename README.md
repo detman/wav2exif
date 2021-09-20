@@ -10,10 +10,10 @@ Very simple umlaut 2 ascii conversion is applied ( 'ö' -> 'oe' etc).
 
 ```bash
 brew install portaudio 
+brew install updatetool 
 python3 -m venv env
 source env/bin/activate
 
 pip install pyaudio
 pip install SpeechRecognition
-pip install exif
 ```
